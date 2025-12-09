@@ -566,6 +566,23 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &352539547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352539541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6eb1595517366d544a61eaf8bb73179d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gyroXTriggerThreshold: 400
+  jumpHeight: 2
+  jumpDuration: 0.5
+  spinDuration: 0.5
+  spinSpeedDegreesPerSecond: 1440
 --- !u!1001 &374619076
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -635,6 +652,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1b8f5d961448c9b419008f2e2b14f9e7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 352539545}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1b8f5d961448c9b419008f2e2b14f9e7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 352539547}
   m_SourcePrefab: {fileID: 100100000, guid: 1b8f5d961448c9b419008f2e2b14f9e7, type: 3}
 --- !u!1 &410087039
 GameObject:
