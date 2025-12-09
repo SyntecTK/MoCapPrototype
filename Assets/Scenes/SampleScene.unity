@@ -526,11 +526,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slowWalkSpeed: 1
   fastWalkSpeed: 2
-  slowWalkThreshold: 0.5
+  slowWalkThreshold: 0.9
   animationCrossfadeTime: 0.2
   circleDetectionRadius: 0.5
   circleCompletionTime: 1.5
   angleTolerance: 30
+  jumpTiltThreshold: 0.7
+  jumpHeight: 1.5
+  jumpDuration: 0.6
+  sneakTiltThreshold: -0.5
+  crouchFreezeDelay: 0.5
 --- !u!114 &352539545
 MonoBehaviour:
   m_ObjectHideFlags: 0
