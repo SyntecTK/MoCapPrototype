@@ -167,7 +167,7 @@ public class PlayerMovement : MonoBehaviour
         StartCoroutine(GyroDashRoutine());
     }
 
-    private System.Collections.IEnumerator GyroDashRoutine()
+    private IEnumerator GyroDashRoutine()
     {
         isGyroDashing = true;
         float facing = Mathf.Sign(transform.localScale.x);
@@ -282,9 +282,9 @@ public class PlayerMovement : MonoBehaviour
         else if (isCrouching)
             targetAnimation = "Crouch";
         else if (Mathf.Approximately(horizontalInput, 0f))
-            targetAnimation = "Idle";
+            targetAnimation = "Idle_img";
         else if (isDashing)
-            targetAnimation = "Dash";
+            targetAnimation = "Run";
         else
             targetAnimation = "Run";
 

@@ -84,7 +84,7 @@ public class GyroController : MonoBehaviour
         canTriggerGyroAction = true;
     }
 
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         JSL.JslDisconnectAndDisposeAll();
     }
