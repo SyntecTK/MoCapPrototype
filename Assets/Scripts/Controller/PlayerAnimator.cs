@@ -26,4 +26,17 @@ public class PlayerAnimator : MonoBehaviour
         animator.CrossFade(name, crossFadeDuration);
     }
 
+    public float GetAnimationLength(string name)
+    {
+        if (animator == null) return 0f;
+
+        AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(0);
+        if (clipInfo.Length > 0)
+        {
+            return clipInfo[0].clip.length;
+        }
+
+        return 0f;
+    }
+
 }

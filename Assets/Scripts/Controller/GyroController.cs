@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class GyroController : MonoBehaviour
 {
@@ -39,7 +40,7 @@ public class GyroController : MonoBehaviour
             JSL.IMU_STATE imu = JSL.JslGetIMUState(handle);
 
             // Debug log accelerometer and gyro
-            Debug.Log($"Device {handle} - Accel: X={imu.accelX:F2}, Y={imu.accelY:F2}, Z={imu.accelZ:F2} | Gyro: X={imu.gyroX:F2}, Y={imu.gyroY:F2}, Z={imu.gyroZ:F2}");
+            //Debug.Log($"Device {handle} - Accel: X={imu.accelX:F2}, Y={imu.accelY:F2}, Z={imu.accelZ:F2} | Gyro: X={imu.gyroX:F2}, Y={imu.gyroY:F2}, Z={imu.gyroZ:F2}");
 
             if (canTriggerGyroAction && Mathf.Abs(imu.gyroX) >= gyroXTriggerThreshold)
             {
@@ -69,14 +70,14 @@ public class GyroController : MonoBehaviour
         StartCoroutine(GyroActionCooldown());
     }
 
-    private System.Collections.IEnumerator JumpCooldown()
+    private IEnumerator JumpCooldown()
     {
         canTriggerJump = false;
         yield return new WaitForSeconds(jumpCooldown);
         canTriggerJump = true;
     }
 
-    private System.Collections.IEnumerator GyroActionCooldown()
+    private IEnumerator GyroActionCooldown()
     {
         canTriggerGyroAction = false;
         yield return new WaitForSeconds(gyroActionCooldown);
