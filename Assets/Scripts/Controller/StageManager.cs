@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -24,23 +26,58 @@ public class StageManager : MonoBehaviour
     [SerializeField] private float movementDistance = 8f;
     [SerializeField] private float transitionDuration = 2f;
 
+    private List<GameObject> elementsL = new List<GameObject>();
+    private List<GameObject> elementsR = new List<GameObject>();
+
+    private bool loaded = false;
+
     private void Start()
     {
-        LoadStage(0);
+        foreach(Transform child in elementsParent.transform)
+        {
+            if(child.name.StartsWith("L"))
+            {
+                elementsL.Add(child.gameObject);
+            }
+            else if(child.name.StartsWith("R"))
+            {
+                           }
+        }
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.L) && !loaded)
+        {
+            LoadStage(0);
+            loaded = true;
+        }
+
+        if(Input.GetKeyDown(KeyCode.U) && loaded)
+        {
+            UnloadStage(0);
+            loaded = false;
+        }
+    }
+
+    private void UnloadStage(int v)
+    {
+        MoveElements(elementsL, -movementDistance);
+        MoveElements(elementsR, movementDistance);
     }
 
     public void LoadStage(int stageIndex)
     {
-        float movementValue = 1f;
-        foreach(Transform child in elementsParent.transform)
-        {
-            if(child.name.StartsWith("R"))
-            {                
-                movementValue = -1f;
-            }
+        MoveElements(elementsL, movementDistance);
+        MoveElements(elementsR, -movementDistance);
+    }
 
-            float newPosX = child.position.x + movementValue * movementDistance;
-            StartCoroutine(MoveElement(child.gameObject, new Vector2(newPosX, child.position.y), transitionDuration));
+    private void MoveElements(List<GameObject> elements, float offsetX)
+    {
+        foreach(GameObject element in elements)
+        {
+            float newPosX = element.transform.position.x + offsetX;
+            StartCoroutine(MoveElement(element, new Vector2(newPosX, element.transform.position.y), transitionDuration));
         }
     }
 
@@ -56,5 +93,20 @@ public class StageManager : MonoBehaviour
             yield return null;
         }
         element.transform.position = targetPosition;
+    }
+
+    private IEnumerator RemoveElement(GameObject element, float duration)
+    {
+        Vector3 startPosition = element.transform.position;
+        Vector3 targetPosition = new Vector3(startPosition.x, startPosition.y - 10f, startPosition.z);
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            element.transform.position = Vector3.Lerp(startPosition, targetPosition, (elapsedTime / duration));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        Destroy(element);
     }
 }
