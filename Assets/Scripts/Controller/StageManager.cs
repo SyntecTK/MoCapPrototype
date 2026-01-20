@@ -28,6 +28,7 @@ public class StageManager : MonoBehaviour
 
     private List<GameObject> elementsL = new List<GameObject>();
     private List<GameObject> elementsR = new List<GameObject>();
+    private List<GameObject> elementsT = new List<GameObject>();
 
     private bool loaded = false;
 
@@ -41,7 +42,12 @@ public class StageManager : MonoBehaviour
             }
             else if(child.name.StartsWith("R"))
             {
-                           }
+                elementsR.Add(child.gameObject);
+            }
+            else if(child.name.StartsWith("T"))
+            {
+                elementsT.Add(child.gameObject);
+            }
         }
     }
 
@@ -49,35 +55,41 @@ public class StageManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.L) && !loaded)
         {
-            LoadStage(0);
+            LoadFirstStage(0);
             loaded = true;
         }
 
         if(Input.GetKeyDown(KeyCode.U) && loaded)
         {
-            UnloadStage(0);
+            UnloadFirstStage(0);
             loaded = false;
         }
     }
 
-    private void UnloadStage(int v)
+    private void UnloadFirstStage(int v)
     {
-        MoveElements(elementsL, -movementDistance);
-        MoveElements(elementsR, movementDistance);
+        MoveElements(elementsL, -movementDistance, true);
+        MoveElements(elementsR, movementDistance, true);
+        MoveElements(elementsT, 5f, false);
     }
 
-    public void LoadStage(int stageIndex)
+    public void LoadFirstStage(int stageIndex)
     {
-        MoveElements(elementsL, movementDistance);
-        MoveElements(elementsR, -movementDistance);
+        MoveElements(elementsL, movementDistance, true);
+        MoveElements(elementsR, -movementDistance, true);
+        MoveElements(elementsT, -5f, false);
     }
 
-    private void MoveElements(List<GameObject> elements, float offsetX)
+    private void MoveElements(List<GameObject> elements, float offsetX, bool horizontal)
     {
         foreach(GameObject element in elements)
         {
             float newPosX = element.transform.position.x + offsetX;
-            StartCoroutine(MoveElement(element, new Vector2(newPosX, element.transform.position.y), transitionDuration));
+            float newPosY = element.transform.position.y + offsetX;
+            if(horizontal)
+                StartCoroutine(MoveElement(element, new Vector2(newPosX, element.transform.position.y), transitionDuration));
+            else
+                StartCoroutine(MoveElement(element, new Vector2(element.transform.position.x, newPosY), transitionDuration));
         }
     }
 

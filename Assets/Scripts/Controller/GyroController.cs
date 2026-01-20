@@ -57,7 +57,6 @@ public class GyroController : MonoBehaviour
         if (playerMovement == null)
             playerMovement = GetComponent<PlayerMovement>();
 
-        playerMovement?.TriggerJump();
         StartCoroutine(JumpCooldown());
     }
 
@@ -66,7 +65,7 @@ public class GyroController : MonoBehaviour
         if (playerMovement == null)
             playerMovement = GetComponent<PlayerMovement>();
 
-        playerMovement?.TriggerGyroDash();
+        //playerMovement.TriggerGyroDash();
         StartCoroutine(GyroActionCooldown());
     }
 
