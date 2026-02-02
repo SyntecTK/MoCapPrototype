@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MotionController : Singleton<MotionController>
@@ -14,11 +14,16 @@ public class MotionController : Singleton<MotionController>
     [SerializeField] private float gestureMinMagnitude = 0.3f;
     [SerializeField] private int gestureMinSamples = 5;
     [SerializeField] private float crouchThreshold = -0.8f;
+    [SerializeField] private float holdUpThreshold = 0.8f;
+    [SerializeField] private float holdUpTime = 0.5f; // Time to hold up
 
     public float CrouchThreshold => crouchThreshold;
 
     private List<Vector2> rightStickSamples = new List<Vector2>();
     private List<float> sampleTimes = new List<float>();
+    private float holdUpStartTime = -1f;
+    private bool combo1Triggered = false;
+    private bool combo2Triggered = false;
 
     public Gesture TrackedGesture(Vector2 input)
     {
@@ -44,7 +49,7 @@ public class MotionController : Singleton<MotionController>
             //bool canPirouette = isDanceJumpCombo || (!isDodging && !isGyroDashing && !isDanceJumpPirouetting && !isJumping && !isCrouching);
             if (inputDetected)
             {
-                //TriggerPirouette();
+                combo1Triggered = true; // Set flag for one-shot
                 rightStickSamples.Clear();
                 sampleTimes.Clear();
                 return Gesture.HalfCircleRight;
@@ -78,4 +83,27 @@ public class MotionController : Singleton<MotionController>
 
         return true;
     }
+
+    // Combo detection methods
+    public bool IsCombo1Detected()
+    {
+        if (combo1Triggered)
+        {
+            combo1Triggered = false;
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsCombo2Detected()
+    {
+        if (combo2Triggered)
+        {
+            combo2Triggered = false;
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsCombo3Detected() { return false; } // Not used here
 }

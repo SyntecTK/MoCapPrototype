@@ -27,4 +27,14 @@ public class PartnerController : Singleton<PartnerController>
         animator.CrossFade("Idle", 0.1f);
     }
 
+    public void Deactivate()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+    }
+
 }

@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using UnityEngine;
 
-public class PlayerAnimator : MonoBehaviour
+public class PlayerAnimator : Singleton<PlayerAnimator>
 {
     [SerializeField] private float crossFadeDuration = 0.1f;
 
@@ -13,9 +13,17 @@ public class PlayerAnimator : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    public void PlayAnimation(string name)
+    public void PlayAnimation(string name, bool forceRestart = false)
     {
         if (animator == null) return;
+
+        if (forceRestart)
+        {
+            animator.Play(name, 0, 0f);
+            currentAnimation = name;
+            return;
+        }
+
         if (currentAnimation == name) return;
 
         currentAnimation = name;
@@ -26,13 +34,21 @@ public class PlayerAnimator : MonoBehaviour
     {
         if (animator == null) return 0f;
 
-        AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(0);
-        if (clipInfo.Length > 0)
+        RuntimeAnimatorController ac = animator.runtimeAnimatorController;
+        for (int i = 0; i < ac.animationClips.Length; i++)
         {
-            return clipInfo[0].clip.length;
+            if (ac.animationClips[i].name == name)
+            {
+                return ac.animationClips[i].length;
+            }
         }
 
         return 0f;
+    }
+
+    public string GetCurrentAnimationName()
+    {
+        return currentAnimation;
     }
 
 }

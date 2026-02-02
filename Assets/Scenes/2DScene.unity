@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 206307945}
   - component: {fileID: 206307944}
   - component: {fileID: 206307943}
+  - component: {fileID: 206307946}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -314,6 +315,10 @@ MonoBehaviour:
   gyroXTriggerThreshold: 400
   jumpCooldown: 0.35
   gyroActionCooldown: 0.35
+  gyroUpThreshold: 400
+  gyroSideThreshold: 400
+  targetRotationDegrees: 50
+  maxTimeWindow: 0.5
 --- !u!61 &206307942
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -399,6 +404,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
   crossFadeDuration: 0.1
+--- !u!114 &206307946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206307932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16452746e111dea4d9ff04611754b5f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DanceComboHandler
+  comboWindow: 1
+  failTimeout: 2
 --- !u!1 &356856167
 GameObject:
   m_ObjectHideFlags: 0
