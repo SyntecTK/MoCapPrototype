@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class OldPlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float slowWalkSpeed = 2f;

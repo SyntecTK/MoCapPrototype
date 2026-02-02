@@ -131,11 +131,11 @@ GameObject:
   - component: {fileID: 206307935}
   - component: {fileID: 206307934}
   - component: {fileID: 206307937}
-  - component: {fileID: 206307938}
-  - component: {fileID: 206307940}
   - component: {fileID: 206307939}
   - component: {fileID: 206307941}
   - component: {fileID: 206307942}
+  - component: {fileID: 206307945}
+  - component: {fileID: 206307944}
   - component: {fileID: 206307943}
   m_Layer: 0
   m_Name: Player
@@ -238,7 +238,7 @@ Transform:
   m_GameObject: {fileID: 206307932}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.28, y: 0.21, z: 0}
+  m_LocalPosition: {x: 3.14, y: -0.82, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -268,35 +268,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &206307938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 206307932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84f1dd53a590aba4dad75fc485e3be5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  raycastOrigin: {fileID: 1528176263}
-  moveSpeed: 5
-  dashSpeedBonus: 3
-  jumpForce: 5
-  lookJumpThreshold: 0.5
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8
-  groundCheckDistance: 0.7
-  gyroDashDistance: 1.5
-  gyroDashDuration: 0.25
-  dodgeDistance: 2
-  dodgeDuration: 0.3
-  gestureTimeWindow: 0.5
-  gestureMinMagnitude: 0.3
-  gestureMinSamples: 5
-  crouchThreshold: -0.8
 --- !u!114 &206307939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,19 +298,6 @@ MonoBehaviour:
   m_DefaultActionMap: 
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &206307940
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 206307932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7cac2990ff61134c82941f6be4543e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
-  crossFadeDuration: 0.1
 --- !u!114 &206307941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -411,9 +369,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 206307932}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1af513680d0cf464382641000ecbe19c, type: 3}
+  m_Script: {fileID: 11500000, guid: b83c127216aa31144a19a63bced476d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DanceController
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  currentState: 0
+--- !u!114 &206307944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206307932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1be319f2e86c32469e98454233ce59f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  moveSpeed: 3
+--- !u!114 &206307945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206307932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ae9afd891419e46924412dba7d9ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
+  crossFadeDuration: 0.1
 --- !u!1 &356856167
 GameObject:
   m_ObjectHideFlags: 0

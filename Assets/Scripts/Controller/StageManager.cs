@@ -4,22 +4,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class StageManager : MonoBehaviour
+public class StageManager : Singleton<StageManager>
 {
-    public static StageManager Instance { get; private set; }
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     [SerializeField] private GameObject elementsParent;
 
     [Header("Stage Settings")]
@@ -34,17 +20,17 @@ public class StageManager : MonoBehaviour
 
     private void Start()
     {
-        foreach(Transform child in elementsParent.transform)
+        foreach (Transform child in elementsParent.transform)
         {
-            if(child.name.StartsWith("L"))
+            if (child.name.StartsWith("L"))
             {
                 elementsL.Add(child.gameObject);
             }
-            else if(child.name.StartsWith("R"))
+            else if (child.name.StartsWith("R"))
             {
                 elementsR.Add(child.gameObject);
             }
-            else if(child.name.StartsWith("T"))
+            else if (child.name.StartsWith("T"))
             {
                 elementsT.Add(child.gameObject);
             }
@@ -53,13 +39,13 @@ public class StageManager : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.L) && !loaded)
+        if (Input.GetKeyDown(KeyCode.L) && !loaded)
         {
             LoadFirstStage(0);
             loaded = true;
         }
 
-        if(Input.GetKeyDown(KeyCode.U) && loaded)
+        if (Input.GetKeyDown(KeyCode.U) && loaded)
         {
             UnloadFirstStage(0);
             loaded = false;
@@ -82,11 +68,11 @@ public class StageManager : MonoBehaviour
 
     private void MoveElements(List<GameObject> elements, float offsetX, bool horizontal)
     {
-        foreach(GameObject element in elements)
+        foreach (GameObject element in elements)
         {
             float newPosX = element.transform.position.x + offsetX;
             float newPosY = element.transform.position.y + offsetX;
-            if(horizontal)
+            if (horizontal)
                 StartCoroutine(MoveElement(element, new Vector2(newPosX, element.transform.position.y), transitionDuration));
             else
                 StartCoroutine(MoveElement(element, new Vector2(element.transform.position.x, newPosY), transitionDuration));

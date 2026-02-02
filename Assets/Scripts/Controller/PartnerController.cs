@@ -1,16 +1,30 @@
 using UnityEngine;
 
-public class PartnerController : MonoBehaviour
+public class PartnerController : Singleton<PartnerController>
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    //================================ Fields =================================//
+    private Animator animator;
+
+    //================================ Unity Methods =================================//
+    private void Awake()
     {
-        
+        animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
-    void Update()
+    //================================ Public Methods =================================//
+    public Vector3 PartnerLocation()
     {
-        
+        return Instance.transform.position;
     }
+
+    public void InitiateDance()
+    {
+        animator.CrossFade("Initiate", 0.1f);
+    }
+
+    public void ReturnToIdle()
+    {
+        animator.CrossFade("Idle", 0.1f);
+    }
+
 }
