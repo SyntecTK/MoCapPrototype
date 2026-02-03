@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : Singleton<PlayerController>
 {
-    public enum PlayerState { Idle, Moving, InitiatingDance, PartnerDance, Dancing }
+    public enum PlayerState { Idle, Moving, InitiatingDance, PartnerDance }
     public PlayerState currentState = PlayerState.Idle;
 
     //================================ Fields =================================//
@@ -12,7 +12,7 @@ public class PlayerController : Singleton<PlayerController>
     [SerializeField] private float danceRange = 1.8f;
     [Header("Gyro Side Step")]
     [SerializeField] private float sideStepDistance = 2f;
-    [SerializeField] private float sideStepDuration = 0.5f;
+    [SerializeField] private float sideStepDuration = 1.5f;
 
     //Components
     private PlayerMovement playerMovement;
@@ -20,12 +20,15 @@ public class PlayerController : Singleton<PlayerController>
     private DanceComboHandler comboHandler;
     private GyroController gyro;
 
+    private GameObject grabHitbox;
+
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerAnimator PlayerAnimator => playerAnimator;
 
     //Movement
     private Vector2 moveInput;
     private Vector2 lookInput;
+    private bool isPerformingSoloMove = false;
 
     //Misc
     private Vector3 startPosition = Vector3.zero;
@@ -41,32 +44,35 @@ public class PlayerController : Singleton<PlayerController>
         comboHandler = GetComponent<DanceComboHandler>();
         gyro = GetComponent<GyroController>();
 
+        grabHitbox = GetComponentInChildren<GrabHitbox>().gameObject;
+
         comboHandler.OnComboFailed += OnComboFailed;
     }
 
     private void Update()
     {
         HandleStateSelection();
-        switch (currentState)
+        if (!isPerformingSoloMove)
         {
-            case PlayerState.Idle:
-                playerAnimator.PlayAnimation("Idle");
-                break;
-            case PlayerState.Moving:
-                playerAnimator.PlayAnimation("Walk");
-                break;
-            case PlayerState.InitiatingDance:
-                playerAnimator.PlayAnimation("DancePose");
-                PartnerController.Instance.InitiateDance();
-                break;
-            case PlayerState.PartnerDance:
-                PartnerController.Instance.Deactivate();
-                comboHandler.UpdateCombo();
-                // If combo completes or fails, handle in comboHandler (e.g., set back to InitiatingDance)
-                break;
-            case PlayerState.Dancing:
-                playerAnimator.PlayAnimation("Dance");
-                break;
+
+            switch (currentState)
+            {
+                case PlayerState.Idle:
+                    playerAnimator.PlayAnimation("Idle");
+                    break;
+                case PlayerState.Moving:
+                    playerAnimator.PlayAnimation("Walk");
+                    break;
+                case PlayerState.InitiatingDance:
+                    playerAnimator.PlayAnimation("DancePose");
+                    PartnerController.Instance.InitiateDance();
+                    break;
+                case PlayerState.PartnerDance:
+                    PartnerController.Instance.Deactivate();
+                    comboHandler.UpdateCombo();
+                    // If combo completes or fails, handle in comboHandler (e.g., set back to InitiatingDance)
+                    break;
+            }
         }
 
         if (currentState != PlayerState.PartnerDance) playerMovement.MovePlayer();
@@ -77,22 +83,25 @@ public class PlayerController : Singleton<PlayerController>
         if (currentState == PlayerState.InitiatingDance)
         {
             if (isMoveLocked) return;
-
-            if (gyro != null && gyro.IsGyroUpDetected())
-            {
-                ExecuteDanceMove("PN_05", false);
-            }
-            else if (gyro != null && gyro.IsGyroSideDetected())
-            {
-                ExecuteDanceMove("PN_06", true, gyro.WasLastGyroSideRight());
-            }
+            TryExecuteDanceInput(currentState);
         }
-        // Handle inputs for PartnerDance (combo chain moves)
         else if (currentState == PlayerState.PartnerDance)
         {
-            // Only accept input during the combo's input window
             if (!comboHandler.IsInputWindowOpen()) return;
+            TryExecuteDanceInput(currentState);
+        }
+        else if (currentState == PlayerState.Idle || currentState == PlayerState.Moving)
+        {
+            if (isMoveLocked) return;
+            TryExecuteDanceInput(currentState);
+        }
+    }
 
+    //================================ Dance Input Handling =================================//
+    private void TryExecuteDanceInput(PlayerState state)
+    {
+        if (state == PlayerState.InitiatingDance || state == PlayerState.PartnerDance)
+        {
             if (gyro != null && gyro.IsGyroUpDetected())
             {
                 ExecuteDanceMove("PN_05", false);
@@ -101,7 +110,42 @@ public class PlayerController : Singleton<PlayerController>
             {
                 ExecuteDanceMove("PN_06", true, gyro.WasLastGyroSideRight());
             }
+            else if (MotionController.Instance != null && MotionController.Instance.IsMotionInputRightSweepDetected())
+            {
+                if (playerAnimator.GetCurrentAnimationName() == "PN_04")
+                {
+                    ActivateGrabHitbox();
+                    ExecuteDanceMove("K_PN_01", false);
+                }
+                else
+                {
+                    ExecuteDanceMove("PN_03", false);
+                }
+            }
+            else if (IsRightStickUpDetected())
+            {
+                ExecuteDanceMove("PN_04", false);
+            }
         }
+        else if (state == PlayerState.Idle || state == PlayerState.Moving)
+        {
+            if (MotionController.Instance != null && MotionController.Instance.IsMotionInputRightSweepDetected())
+            {
+                ExecuteSoloMove("Pirouette", true, transform.localScale.x > 0);
+            }
+            else if (IsRightStickUpDetected())
+            {
+                ExecuteSoloMove("Jump", false);
+            }
+        }
+    }
+
+    private bool IsRightStickUpDetected()
+    {
+        if (Gamepad.current == null) return false;
+
+        Vector2 rightStick = Gamepad.current.rightStick.ReadValue();
+        return rightStick.y > 0.8f;
     }
 
     //================================ State Management =================================//
@@ -190,9 +234,9 @@ public class PlayerController : Singleton<PlayerController>
     //================================ Event Handlers =================================//
     private void OnComboFailed()
     {
-        Debug.Log("Reset");
         isMoveLocked = false;
-        if (gyro != null) gyro.ClearPendingTriggers(); // Clear any buffered inputs
+        if (gyro != null) gyro.ClearPendingTriggers();
+        DeactivateGrabHitbox();
         SetState(PlayerState.InitiatingDance);
         ResetPlayerPosition();
     }
@@ -263,8 +307,30 @@ public class PlayerController : Singleton<PlayerController>
             DanceSideWays(moveRight);
         }
 
+        // Special handling for grab move
+        if (animationName == "K_PN_01")
+        {
+            ActivateGrabHitbox();
+            StartCoroutine(DeactivateGrabHitboxAfterDelay(animLength));
+        }
+
         StartCoroutine(LockInputForDuration(animLength));
         SetState(PlayerState.PartnerDance);
+    }
+
+    private void ExecuteSoloMove(string animationName, bool hasSideMovement, bool moveRight = false)
+    {
+        float animLength = playerAnimator.GetAnimationLength(animationName);
+        playerAnimator.PlayAnimation(animationName, true);
+        isPerformingSoloMove = true;
+
+        if (hasSideMovement)
+        {
+            DanceSideWays(moveRight);
+        }
+
+        StartCoroutine(LockInputForDuration(animLength));
+        StartCoroutine(ResetSoloMoveFlag(animLength));
     }
 
     //================================ Input Lock =================================//
@@ -279,6 +345,32 @@ public class PlayerController : Singleton<PlayerController>
         float lockTime = Mathf.Max(0f, duration - inputWindowBuffer);
         yield return new WaitForSeconds(lockTime);
         isMoveLocked = false;
+    }
+
+    //================================ Misc =================================//
+
+    private void ActivateGrabHitbox()
+    {
+        if (grabHitbox != null)
+            grabHitbox.GetComponent<BoxCollider2D>().enabled = true;
+    }
+
+    private void DeactivateGrabHitbox()
+    {
+        if (grabHitbox != null)
+            grabHitbox.GetComponent<BoxCollider2D>().enabled = false;
+    }
+
+    private IEnumerator DeactivateGrabHitboxAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        DeactivateGrabHitbox();
+    }
+
+    private IEnumerator ResetSoloMoveFlag(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        isPerformingSoloMove = false;
     }
 
 }

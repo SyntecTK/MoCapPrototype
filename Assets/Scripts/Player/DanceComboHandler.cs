@@ -9,7 +9,7 @@ public class DanceComboHandler : MonoBehaviour
     //================================ Fields =================================//
 
     [SerializeField] private float inputWindowDuration = 0.4f; // Time window at end of animation to accept input
-    [SerializeField] private float failTimeout = 2.0f; // Fallback if something goes wrong
+    [SerializeField] private float failTimeout = 1.2f; // Fallback if something goes wrong
 
     private Transform playerTransform;
     private Vector3 playerStartPos;
@@ -60,8 +60,6 @@ public class DanceComboHandler : MonoBehaviour
         {
             gyroController.ClearPendingTriggers();
         }
-
-        Debug.Log($"Move started: {animationName}, duration: {duration}s");
     }
 
     public void UpdateCombo()
@@ -76,20 +74,10 @@ public class DanceComboHandler : MonoBehaviour
             {
                 inputWindowOpen = true;
                 waitingForNextMove = true;
-                Debug.Log("INPUT WINDOW OPEN - Make your next move!");
             }
         }
 
-        if (elapsed >= currentMoveDuration)
-        {
-            if (waitingForNextMove)
-            {
-                Debug.Log("Missed the timing window!");
-                FailCombo();
-            }
-        }
-
-        if (elapsed > failTimeout)
+        if (elapsed > currentMoveDuration + failTimeout)
         {
             FailCombo();
         }

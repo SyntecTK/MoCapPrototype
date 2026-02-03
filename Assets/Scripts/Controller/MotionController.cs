@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MotionController : Singleton<MotionController>
 {
@@ -14,51 +15,47 @@ public class MotionController : Singleton<MotionController>
     [SerializeField] private float gestureMinMagnitude = 0.3f;
     [SerializeField] private int gestureMinSamples = 5;
     [SerializeField] private float crouchThreshold = -0.8f;
-    [SerializeField] private float holdUpThreshold = 0.8f;
-    [SerializeField] private float holdUpTime = 0.5f; // Time to hold up
 
     public float CrouchThreshold => crouchThreshold;
 
     private List<Vector2> rightStickSamples = new List<Vector2>();
     private List<float> sampleTimes = new List<float>();
-    private float holdUpStartTime = -1f;
     private bool combo1Triggered = false;
     private bool combo2Triggered = false;
 
-    public Gesture TrackedGesture(Vector2 input)
+    private void Update()
     {
-        // Only track if in bottom half (y <= 0)
-        if (input.magnitude >= gestureMinMagnitude && input.y <= 0)
-        {
-            rightStickSamples.Add(input.normalized);
-            sampleTimes.Add(Time.time);
-        }
+        if (Gamepad.current == null) return;
 
-        // Clean up old samples outside time window
-        while (sampleTimes.Count > 0 && Time.time - sampleTimes[0] > gestureTimeWindow)
-        {
-            rightStickSamples.RemoveAt(0);
-            sampleTimes.RemoveAt(0);
-        }
+        Vector2 rightStick = Gamepad.current?.rightStick.ReadValue() ?? Vector2.zero;
+        float currentTime = Time.time;
 
-        // Check for half-circle gesture
-        if (rightStickSamples.Count >= gestureMinSamples)
+        if (rightStick.magnitude > gestureMinMagnitude)
         {
-            bool inputDetected = DetectHalfCircle();
-            //bool isDanceJumpCombo = (danceState == DanceState.Dancing && isJumping);
-            //bool canPirouette = isDanceJumpCombo || (!isDodging && !isGyroDashing && !isDanceJumpPirouetting && !isJumping && !isCrouching);
-            if (inputDetected)
+            rightStickSamples.Add(rightStick);
+            sampleTimes.Add(currentTime);
+        }
+        else if (rightStickSamples.Count > 0)
+        {
+            // Stick returned to neutral - evaluate the gesture now
+            if (rightStickSamples.Count >= gestureMinSamples)
             {
-                combo1Triggered = true; // Set flag for one-shot
-                rightStickSamples.Clear();
-                sampleTimes.Clear();
-                return Gesture.HalfCircleRight;
+                DetectRightToBottomLeftSweep();
             }
+            // Clear samples when stick is released
+            rightStickSamples.Clear();
+            sampleTimes.Clear();
         }
 
-        return Gesture.None;
+        while (sampleTimes.Count > 0 && currentTime - sampleTimes[0] > gestureTimeWindow)
+        {
+            sampleTimes.RemoveAt(0);
+            rightStickSamples.RemoveAt(0);
+        }
     }
-    private bool DetectHalfCircle()
+
+
+    public bool DetectHalfCircle()
     {
 
         float startX = rightStickSamples[0].x;
@@ -84,8 +81,78 @@ public class MotionController : Singleton<MotionController>
         return true;
     }
 
+    /// <summary>
+    /// Detects a ~100° sweep starting from the right side, going through the bottom, ending at bottom-left.
+    /// Right = 0°, Bottom = -90°, Bottom-Left = ~-100° to -135°
+    /// </summary>
+    public bool DetectRightToBottomLeftSweep()
+    {
+        if (rightStickSamples.Count < gestureMinSamples)
+            return false;
+
+        // Find the rightmost point (start of gesture)
+        int rightMostIndex = -1;
+        float rightMostX = -1f;
+        for (int i = 0; i < rightStickSamples.Count; i++)
+        {
+            if (rightStickSamples[i].x > rightMostX && Mathf.Abs(rightStickSamples[i].y) < 0.6f)
+            {
+                rightMostX = rightStickSamples[i].x;
+                rightMostIndex = i;
+            }
+        }
+
+        // Must have started on the right side
+        if (rightMostX < 0.4f || rightMostIndex < 0)
+            return false;
+
+        // Find if we passed through bottom AFTER the rightmost point
+        int bottomIndex = -1;
+        for (int i = rightMostIndex; i < rightStickSamples.Count; i++)
+        {
+            if (rightStickSamples[i].y < -0.5f)
+            {
+                bottomIndex = i;
+                break;
+            }
+        }
+
+        if (bottomIndex < 0)
+            return false;
+
+        // Find if we ended in bottom-left AFTER passing through bottom
+        bool endedBottomLeft = false;
+        for (int i = bottomIndex; i < rightStickSamples.Count; i++)
+        {
+            Vector2 sample = rightStickSamples[i];
+            // Bottom-left zone: x < 0, y < 0
+            if (sample.x < -0.2f && sample.y < -0.2f)
+            {
+                endedBottomLeft = true;
+                break;
+            }
+        }
+
+        if (!endedBottomLeft)
+            return false;
+
+        // Verify the motion was in the correct direction (clockwise)
+        // Check that samples generally progress: right -> bottom -> bottom-left
+        bool validMotion = rightMostIndex < bottomIndex;
+
+        if (validMotion)
+        {
+            Debug.Log("Right Sweep Motion Detected!");
+            combo1Triggered = true;
+            rightStickSamples.Clear();
+            sampleTimes.Clear();
+            return true;
+        }
+
+        return false;
+    }
     // Combo detection methods
-    public bool IsCombo1Detected()
+    public bool IsMotionInputRightSweepDetected()
     {
         if (combo1Triggered)
         {

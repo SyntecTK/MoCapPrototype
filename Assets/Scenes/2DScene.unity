@@ -378,6 +378,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   currentState: 0
+  danceRange: 1.8
+  sideStepDistance: 2
+  sideStepDuration: 0.5
 --- !u!114 &206307944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -416,8 +419,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16452746e111dea4d9ff04611754b5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DanceComboHandler
-  comboWindow: 1
+  inputWindowDuration: 0.4
   failTimeout: 2
+  availableMoves: []
 --- !u!1 &356856167
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,9 +512,10 @@ GameObject:
   - component: {fileID: 461057453}
   - component: {fileID: 461057454}
   - component: {fileID: 461057455}
+  - component: {fileID: 461057456}
   m_Layer: 0
   m_Name: T_StagePiece01
-  m_TagString: Untagged
+  m_TagString: Collectible
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -524,7 +529,7 @@ Transform:
   m_GameObject: {fileID: 461057452}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.26, y: 9.3, z: 0}
+  m_LocalPosition: {x: -2.27, y: 9.3, z: 0}
   m_LocalScale: {x: 0.2, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -634,6 +639,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 4.5842505, y: 3.6653786}
   m_EdgeRadius: 0
+--- !u!114 &461057456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461057452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae3800cbdc784d44a19ec13ceca32da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Collectible
+  grabHitbox: {fileID: 1090621141}
 --- !u!1 &656450183
 GameObject:
   m_ObjectHideFlags: 0
@@ -918,8 +936,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1090621139}
   - component: {fileID: 1090621140}
+  - component: {fileID: 1090621141}
   m_Layer: 0
-  m_Name: GrabCollider
+  m_Name: GrabHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -934,7 +953,7 @@ Transform:
   m_GameObject: {fileID: 1090621138}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.32, z: 0}
+  m_LocalPosition: {x: 0, y: 2.66, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -947,7 +966,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1090621138}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -970,7 +989,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -986,6 +1005,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1090621141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090621138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b582b8587e07414a8b8dd69a869d9ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabHitbox
 --- !u!1 &1160049614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1213,6 +1244,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1364026604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+--- !u!1 &1276830874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1276830875}
+  m_Layer: 0
+  m_Name: Singletons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1276830875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1276830874}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.34966, y: 0.6655, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1717472254}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1364026603
 GameObject:
   m_ObjectHideFlags: 0
@@ -1272,7 +1335,7 @@ Transform:
   m_GameObject: {fileID: 1389867717}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.24875, y: 0, z: -0.76531}
+  m_LocalPosition: {x: -0.24875, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1586,6 +1649,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1364026604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1717472253
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1717472254}
+  - component: {fileID: 1717472255}
+  m_Layer: 0
+  m_Name: MotionController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1717472254
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717472253}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1276830875}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1717472255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717472253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38ab597e64163e7468b88a2c307af6b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotionController
+  gestureTimeWindow: 0.5
+  gestureMinMagnitude: 0.3
+  gestureMinSamples: 5
+  crouchThreshold: -0.8
 --- !u!1 &1743938044
 GameObject:
   m_ObjectHideFlags: 0
@@ -1881,6 +1992,7 @@ SpriteRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1276830875}
   - {fileID: 741327192}
   - {fileID: 1696649571}
   - {fileID: 1364026604}

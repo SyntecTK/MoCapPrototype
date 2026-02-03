@@ -73,9 +73,9 @@ public class StageManager : Singleton<StageManager>
             float newPosX = element.transform.position.x + offsetX;
             float newPosY = element.transform.position.y + offsetX;
             if (horizontal)
-                StartCoroutine(MoveElement(element, new Vector2(newPosX, element.transform.position.y), transitionDuration));
+                StartCoroutine(MoveElement(element, new Vector3(newPosX, element.transform.position.y, 0), transitionDuration));
             else
-                StartCoroutine(MoveElement(element, new Vector2(element.transform.position.x, newPosY), transitionDuration));
+                StartCoroutine(MoveElement(element, new Vector3(element.transform.position.x, newPosY, 0), transitionDuration));
         }
     }
 
@@ -86,11 +86,12 @@ public class StageManager : Singleton<StageManager>
 
         while (elapsedTime < duration)
         {
-            element.transform.position = Vector3.Lerp(startPosition, targetPosition, (elapsedTime / duration));
+            Vector3 interpolated = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            element.transform.position = new Vector3(interpolated.x, interpolated.y, 0);  // Force Z to 0
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        element.transform.position = targetPosition;
+        element.transform.position = new Vector3(targetPosition.x, targetPosition.y, 0);  // Ensure final position has Z=0
     }
 
     private IEnumerator RemoveElement(GameObject element, float duration)

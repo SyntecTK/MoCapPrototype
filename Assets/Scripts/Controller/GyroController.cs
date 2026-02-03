@@ -23,7 +23,6 @@ public class GyroController : MonoBehaviour
     private float rotationStartTime = 0f;
     private bool isTrackingRotation = false;
 
-    private bool canTriggerJump = true;
     private bool canTriggerGyroAction = true;
     private bool combo3Triggered = false;
     private bool combo4Triggered = false;
@@ -72,7 +71,6 @@ public class GyroController : MonoBehaviour
 
                 if (accumulatedRotationUp >= targetRotationDegrees)
                 {
-                    Debug.Log($"Gyro UP triggered! Rotation: {accumulatedRotationUp}° in {Time.time - rotationStartTime}s");
                     combo3Triggered = true;
                     ResetRotationTracking();
                     StartCoroutine(GyroActionCooldown());
@@ -87,7 +85,6 @@ public class GyroController : MonoBehaviour
             // Gyro SIDE detection - now independent
             if (canTriggerGyroAction && angularVelocitySide >= gyroSideThreshold)
             {
-                Debug.Log($"Gyro SIDE triggered! Value: {angularVelocitySide}");
                 combo4Triggered = true;
                 lastGyroSideWasRight = (imu.gyroY < 0);
                 StartCoroutine(GyroActionCooldown());
@@ -100,29 +97,6 @@ public class GyroController : MonoBehaviour
     {
         isTrackingRotation = false;
         accumulatedRotationUp = 0f;
-    }
-
-    private void TriggerJump()
-    {
-        if (playerMovement == null)
-            playerMovement = GetComponent<PlayerMovement>();
-
-        StartCoroutine(JumpCooldown());
-    }
-
-    private void TriggerGyroAction()
-    {
-        if (playerMovement == null)
-            playerMovement = GetComponent<PlayerMovement>();
-
-        StartCoroutine(GyroActionCooldown());
-    }
-
-    private IEnumerator JumpCooldown()
-    {
-        canTriggerJump = false;
-        yield return new WaitForSeconds(jumpCooldown);
-        canTriggerJump = true;
     }
 
     private IEnumerator GyroActionCooldown()
