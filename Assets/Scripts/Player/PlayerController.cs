@@ -35,6 +35,8 @@ public class PlayerController : Singleton<PlayerController>
     private bool isMoveLocked = false;
     private Coroutine activeDanceMoveCoroutine;
 
+    bool newAnimationMode = false;
+
     //================================ Unity Methods =================================//
 
     private void Awake()
@@ -61,7 +63,10 @@ public class PlayerController : Singleton<PlayerController>
                     playerAnimator.PlayAnimation("Idle");
                     break;
                 case PlayerState.Moving:
-                    playerAnimator.PlayAnimation("Walk");
+                    if(newAnimationMode)
+                        playerAnimator.PlayAnimation("NewWalk");
+                    else
+                        playerAnimator.PlayAnimation("Walk");
                     break;
                 case PlayerState.InitiatingDance:
                     playerAnimator.PlayAnimation("DancePose");
@@ -76,6 +81,11 @@ public class PlayerController : Singleton<PlayerController>
         }
 
         if (currentState != PlayerState.PartnerDance) playerMovement.MovePlayer();
+
+        if(Input.GetKeyDown(KeyCode.N))
+        {
+            newAnimationMode = !newAnimationMode;
+        }
     }
 
     private void LateUpdate()
@@ -131,7 +141,10 @@ public class PlayerController : Singleton<PlayerController>
         {
             if (MotionController.Instance != null && MotionController.Instance.IsMotionInputRightSweepDetected())
             {
-                ExecuteSoloMove("Pirouette", true, transform.localScale.x > 0);
+                if(newAnimationMode)
+                    ExecuteSoloMove("NewPirouette", false, transform.localScale.x > 0);
+                else
+                    ExecuteSoloMove("Pirouette", true, transform.localScale.x > 0);
             }
             else if (IsRightStickUpDetected())
             {
